@@ -1,0 +1,82 @@
+services:
+  auth_service:
+    image: sinhnguyen417/auth_service:latest
+    container_name: auth_service
+    restart: always
+    environment:
+      - GO_ENV=qa
+    ports:
+      - "50000:50000"
+    volumes:
+      - ./config/auth_conf/qa.yaml:/app/qa.yaml
+    networks:
+      - schedule_network
+    depends_on:
+      - postgres
+  schedule_gateway:
+    image: sinhnguyen417/schedule_gateway:latest
+    container_name: schedule_gateway
+    restart: always
+    environment:
+      - GO_ENV=qa
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config/gateway_conf/qa.yaml:/app/qa.yaml
+    networks:
+      - schedule_network
+  user_service:
+    image: sinhnguyen417/user_service:latest
+    container_name: user_service
+    restart: always
+    environment:
+      - GO_ENV=qa
+    ports:
+      - "50001:50001"
+    volumes:
+      - ./config/user_conf/qa.yaml:/app/qa.yaml
+    networks:
+      - schedule_network
+  postgres:
+    image: postgres:16.9-alpine3.22
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=@Sinh1234
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - schedule_network
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites-available:/etc/nginx/sites-available:ro
+      - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+    networks:
+      - schedule_network
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - schedule_network
+networks:
+  schedule_network:
+    driver: bridge
+volumes:
+  redis-data:

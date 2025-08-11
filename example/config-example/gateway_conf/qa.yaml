@@ -1,0 +1,15 @@
+server:
+  port: 
+  host: 
+  mode: 
+
+log:
+  level: 
+
+auth_service:
+  host: 
+  port: 
+
+user_service:
+  host: 
+  port: 
