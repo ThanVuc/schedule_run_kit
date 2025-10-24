@@ -1,6 +1,0 @@
-kafka:
-  brokers:
-    - redpanda:9092
-
-server:
-  listenPort: 9645

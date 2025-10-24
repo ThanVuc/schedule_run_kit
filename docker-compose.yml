@@ -19,6 +19,20 @@ services:
       - "15672:15672"
     networks:
       - schedule_network
+  mongo:
+    image: mongo:8.0.13
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo/init-mongodb.js:/docker-entrypoint-initdb.d/init-mongodb.js:ro
+    networks:
+      - schedule_network
 
 networks:
   schedule_network:
@@ -26,3 +40,4 @@ networks:
 
 volumes:
   redis-data:
+  mongo_data:
