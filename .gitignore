@@ -1,2 +1,4 @@
 config/
 postgres/init/
+mongo/
+restore.sh
