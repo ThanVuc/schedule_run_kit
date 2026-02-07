@@ -20,19 +20,28 @@ services:
     networks:
       - schedule_network
   mongo:
-    image: mongo:8.0.13
+    image: mongo:latest
     container_name: mongodb
-    restart: always
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: mongo
+    restart: unless-stopped
+    command:
+      - mongod
+      - --replSet
+      - rs0
+      - --auth
+      - --keyFile
+      - /data/configdb/mongo-keyfile
+      - --bind_ip_all
     volumes:
       - mongo_data:/data/db
-      - ./mongo/init-mongodb.js:/docker-entrypoint-initdb.d/init-mongodb.js:ro
+      - mongo_config:/data/configdb
+      - ./mongo/keyFile/mongo-keyfile:/data/configdb/mongo-keyfile
+      - ./mongo/01-init-replica.js:/docker-entrypoint-initdb.d/01-init-replica.js:ro
+      - ./mongo/02-init-users.js:/docker-entrypoint-initdb.d/02-init-users.js:ro
+    ports:
+      - "27017:27017"
     networks:
       - schedule_network
+
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -55,3 +64,4 @@ networks:
 volumes:
   redis-data:
   mongo_data:
+  mongo_config:

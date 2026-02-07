@@ -2,3 +2,4 @@ config/
 postgres/init/
 mongo/
 restore.sh
+restore/
